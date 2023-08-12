@@ -1,0 +1,89 @@
+<{% extends 'main.html' %}
+
+{% block title %}
+Публикации
+{% endblock title %}
+
+{% block content %}
+
+<div style="display: flex">
+    <div style="flex-basis: 90%">
+        {% if user.is_authenticated %}
+        Вы зашли как {{ request.user.username }}!
+        {% else %}
+        <p><a href="{% url 'login' %}" style="text-decoration: none; color: #778899;">Log in</a></p>
+
+        {% endif %}
+        <br>
+
+        <h2>Коментарии к моим публикациям</h2>
+        <hr>
+
+        {% if mycoments %}
+        <form action="" method="get">
+            {{ filterset.form.as_p }}
+            <input type="submit" value="Поиск"/>
+        </form>
+
+        <br>
+
+        <table style="margin-right: auto; margin-right: auto;">
+            {% for coment in mycoments %}
+
+            <tr>
+                </td>
+                <td>
+                <td style="text-align: justify">
+                    <a href="http://127.0.0.1:8000/post/{{ coment.post.id }}"
+                       style="text-decoration: none; color: #778898;">{{ coment.post.title }}</a>
+                    <br><br>
+
+                    <p style="text-align: justify">Коментарий от: {{ coment.author|truncatewords:25 }}
+                        | {{ coment.dateCreation|date:'M d Y' }}
+                        <i>"{{ coment.text }}"</i></p>
+                        <br>
+
+
+                        {% if not coment.accepted %}
+                        <form method="POST">
+                            {% csrf_token %}
+                            <label style="text-decoration: none; color: #DCDCDC;"> Коментарий не подтвержден </label>
+                            <input type="hidden" value='{{ coment.id }}' name="coment">
+                            <input type="submit" value='Подтвердить'>
+                        </form>
+                        {% else %}
+                        <form method="POST">
+                            {% csrf_token %}
+                            <label style="text-decoration: none; color: #DCDCDC;"> Комментарий подтвержден </label>
+                            <input type="hidden" value='{{ coment.id }}' name="coment">
+                            <input type="submit" value="Отклонить">
+                        </form>
+
+                        {% endif %}
+
+                        <hr>
+                </td>
+
+            </tr>
+            <tr>
+                <td>
+                    <br>
+                </td>
+            </tr>
+
+
+            {% endfor %}
+        </table>
+        {% else %}
+        <h3>Нет коментариев</h3>
+        <br><br>
+        <a class="btn btn-secondary" onClick="javascript:history.go(-1);" role="button">Назад</a>
+        {% endif %}
+
+        <br>
+
+        {% if mycoments %}
+        {% include 'pagination.html' %}
+        {% endif %}
+
+        {% endblock content %}
